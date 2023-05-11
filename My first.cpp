@@ -1,113 +1,139 @@
+#include <cstring>
+#include <string>
 #include <iostream>
 using namespace std;
 
-struct node
-{
-    int key;
-    struct node* left, * right;
+
+struct HashTable {
+    int MAX_LENGTH = 4;
+    string* password = new string[MAX_LENGTH];
+
+    void intialize_hashtable() {
+        for (int i = 0; i < 4; i++) {
+            password[i].clear();
+        }
+    }
+    bool isFull() {
+        bool full = true;
+        int count = 0;
+        for (int i = 0; i < MAX_LENGTH; i++) {
+            if (password[i].empty()) {
+                full = false;
+            }
+        }
+        return full;
+    }
+    int hashfunc(string user_name) {
+        int sum = 0;
+        int hash = 0;
+        //add your code below
+        for (char i : user_name) {
+            sum = sum + i;
+        }
+        hash = sum % MAX_LENGTH;
+
+        return hash;
+    }
+    bool is_slot_empty(int hash) {
+        bool empty = password[hash].empty();
+        return empty;
+    }
+    void insert(string user_name, string user_password) {
+        int hash;
+        bool empty;
+        hash = hashfunc(user_name);
+        empty = is_slot_empty(hash);
+        //add an if condition to complete the code here
+        if (empty) {
+            password[hash] = user_password;
+        }
+        else {
+            return;
+        }
+        
+
+    }
+    void hash_lookup(string user_name) {
+        int hash;
+        bool empty;
+        hash = hashfunc(user_name);
+        empty = is_slot_empty(hash);
+        //add an if condition to complete the code here
+        if (empty) {
+            cout << "Not found-404";
+        }
+        else {
+            cout << password[hash];
+        }
+
+
+    }
+    void delete_item(string user_name) {
+        int hash;
+        bool empty;
+        hash = hashfunc(user_name);
+        empty = is_slot_empty(hash);
+        if (empty) {
+            cout << "No item found\n";
+        }
+        else {
+            password[hash].clear();
+            cout << "User deleted\n";
+        }
+
+    }
+    void print_hashtable() {
+        for (int i = 0; i < MAX_LENGTH; i++) {
+            cout << "[" << i << "]-->" << password[i] << "\n";
+        }
+    }
+
 };
 
-// Inorder traversal
-void traverseInOrder(struct node* root)
-{
-    if (root == NULL)
-        return;
+int main() {
+    HashTable* hashtbl = new HashTable;
+    hashtbl->intialize_hashtable();
+    cout << hashtbl->isFull() << "\n";
 
-    traverseInOrder(root->left);
-    cout << root->key << " ";
-    traverseInOrder(root->right);
-}
+    int command = 0;
+    string user_name;
+    string password;
+    while (command != -1) {
+        /* code */
+        cout << "Type command: ";
+        cin >> command;
+        switch (command) {
+        case 1:
+            /* insert the new item*/
+            cout << "Enter user name: ";
+            cin >> user_name;
+            cout << "Enter password to be saved: ";
+            cin >> password;
+            hashtbl->insert(user_name, password);
+            break;
+        case 2:
+            /* delete item */
+            cout << "Enter item to be deleted: ";
+            cin >> user_name;
+            hashtbl->delete_item(user_name);
+            break;
+        case 3:
+            /* hash lookup password*/
+            cout << "Enter user name to look up password:";
+            cin >> user_name;
+            hashtbl->hash_lookup(user_name);
+            break;
+        case 4:
+            hashtbl->print_hashtable();
+            break;
+        case -1:
+            /* hash lookup password*/
+            cout << "Exiting...\n";
+            break;
 
-// Insert a node
-struct node* insertNode(struct node* node, int key)
-{
-    if (node == NULL)
-    {
-        node = new struct node;
-        node->key = key;
-        node->left = NULL;
-        node->right = NULL;
-        return node;
-    }
-
-    if (node->key > key)
-    {
-        node->left = insertNode(node->left, key);
-    }
-    else if (node->key < key)
-    {
-        node->right = insertNode(node->right, key);
-    }
-
-    return node;
-}
-
-// Deleting a node
-struct node* deleteNode(struct node* root, int key)
-{
-    if (root == NULL)
-    {
-        return root;
-    }
-
-    if (key < root->key)
-    {
-        root->left = deleteNode(root->left, key);
-    }
-    else if (key > root->key)
-    {
-        root->right = deleteNode(root->right, key);
-    }
-    else
-    {
-        if (root->left == NULL || root->right == NULL)
-        {
-            struct node* temp = root->left ? root->left : root->right;
-            delete root;
-            return temp;
         }
 
-        struct node* temp = root->right;
 
-        while (temp->left)
-            temp = temp->left;
-
-
-        root->key = temp->key;
-        root->right = deleteNode(root->right, temp->key);
     }
-
-    return root;
-}
-
-// Driver code
-int main()
-{
-    struct node* root = NULL;
-
-    int operation;
-    int operand;
-    cin >> operation;
-
-    while (operation != -1)
-    {
-        switch (operation)
-        {
-        case 1: // insert
-            cin >> operand;
-            root = insertNode(root, operand);
-            cin >> operation;
-            break;
-        case 2: // delete
-            cin >> operand;
-            root = deleteNode(root, operand);
-            cin >> operation;
-            break;
-        default:
-            cout << "Invalid Operator!\n";
-            return 0;
-        }
-    }
-
-    traverseInOrder(root);
+    return 0;
 }
